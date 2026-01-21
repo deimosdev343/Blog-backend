@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean
+from sqlalchemy import Column, Integer, String, Float, Boolean,DateTime, func
 from database import Base
 
 class UserModel(Base):
@@ -7,5 +7,7 @@ class UserModel(Base):
   id = Column(Integer, primary_key=True, nullable=False)
   username = Column(String(100), unique=True, nullable=False)
   hashed_password = Column(String(100), nullable=False)
+  email = Column(String(100), unique=True, nullable=False)
+  created_at = Column(DateTime, default=func.now())
   
   
