@@ -27,3 +27,17 @@ def create_post(post: PostCreate, db: Session = Depends(get_db), user = Depends(
     db.add(db_post)
     db.commit()
     return {"msg":"post created successfully"}
+
+@router.get("/")
+def get_posts(
+    skip:int = 0, 
+    limit: int = 10,
+    db: Session = Depends(get_db)):
+    return (
+        db.query(Post)
+            .order_by(Post.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+    )
+    
