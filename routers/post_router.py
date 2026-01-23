@@ -18,8 +18,9 @@ def get_db():
 
 @router.post("/")
 def create_post(post: PostCreate, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    
     db_post = Post(
-        author_id= user.id,
+        author_id= user["id"],
         title=post.title,
         content=post.content
     )

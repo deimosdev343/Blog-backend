@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean,DateTime, func, Text, ForeignKey
 from sqlalchemy.orm import relationship 
 from database import Base
-from datetime import datetime, timezone
+
 
 class Post(Base):
   __tablename__= "posts"
@@ -10,6 +10,6 @@ class Post(Base):
   author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
   title = Column(String(100), nullable=False)
   content = Column(Text(300000), nullable=False)
-  created_at = Column(DateTime, default=timezone.utc)
-  updated_at = Column(DateTime, default=timezone.utc, onupdate=timezone.utc)
+  created_at = Column(DateTime, default=func.now())
+  updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
   
