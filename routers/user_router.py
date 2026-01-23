@@ -4,6 +4,8 @@ from dto.user_dto import UserCreate, UserLogin
 from models.user_model import UserModel
 from database import SessionLocal
 from utils.hash import hash_password, verify_password
+from utils.auth import create_access_token
+
 router = APIRouter(
   prefix="/user",
   tags=["user"]
@@ -31,5 +33,17 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
   db.commit()
   db.flush()
   return {"msg":"user successfully registered"};
+
+@router.post("/login")
+def login(user_login:UserLogin, db: Session = Depends(get_db)):
+  user = db.query(UserModel).filter(UserModel.username == user_login.username).first()
+  if not user: 
+    raise HTTPException(status_code=401, detail="Invalid username or password")
+  verify_result = verify_password(cleartxt_pw=user_login.password, hashed_pw=user.hashed_password)
+  if not verify_result:
+    raise HTTPException(status_code=401, detail="invalid username or password")
+  
+  token = create_access_token({"username":user.username, "email":user.email})
+  return {"access_token":token, "token_type":"bearer"}
 
 
