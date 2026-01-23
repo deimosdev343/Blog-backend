@@ -17,7 +17,7 @@ def get_db():
     db.close()
     
 
-@router.get('/register')
+@router.post('/register')
 def register(user: UserCreate, db: Session = Depends(get_db)):
   existing_user = db.query(UserModel).filter(UserModel.username == user.username).first()
   if existing_user:
@@ -29,5 +29,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
   db_user = UserModel(username=user.username, hashed_password=hashed_pw, email= user.email)
   db.add(db_user)
   db.commit()
-  db.refresh(UserModel)
+  db.flush()
+  return {"msg":"user successfully registered"};
+
 
