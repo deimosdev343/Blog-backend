@@ -16,6 +16,7 @@ def get_db():
   finally:
     db.close()
     
-@router.get('/test')
-def test(db: Session = Depends(get_db)):
-  return {"msg":"test route"};
+
+@router.get('/register')
+def register(user: UserCreate, db: Session = Depends(get_db)):
+  existing_user = db.query(UserModel).filter(UserModel.username == UserModel.username).first()
