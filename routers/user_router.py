@@ -43,7 +43,7 @@ def login(user_login:UserLogin, db: Session = Depends(get_db)):
   if not verify_result:
     raise HTTPException(status_code=401, detail="invalid username or password")
   
-  token = create_access_token({"username":user.username, "email":user.email, "user": user.id})
+  token = create_access_token({"username":user.username, "email":user.email, "id": user.id})
   return {"access_token":token, "token_type":"bearer"}
 
 

@@ -16,7 +16,7 @@ def get_db():
     finally:
         db.close()
 
-router.post("/")
+@router.post("/")
 def create_post(post: PostCreate, db: Session = Depends(get_db), user = Depends(get_current_user)):
     db_post = Post(
         author_id= user.id,
@@ -25,3 +25,4 @@ def create_post(post: PostCreate, db: Session = Depends(get_db), user = Depends(
     )
     db.add(db_post)
     db.commit()
+    return {"msg":"post created successfully"}
