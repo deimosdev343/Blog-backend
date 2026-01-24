@@ -1,0 +1,16 @@
+#This is an example .yml
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend # Assumes your FastAPI code is in a 'backend' directory
+    ports:
+      - "8000:8000"
+    environment:
+      # Database connection URL for FastAPI; 'db' is the service name of the PostgreSQL container
+      DATABASE_URL: "db_url_here"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
