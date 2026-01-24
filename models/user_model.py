@@ -8,5 +8,6 @@ class UserModel(Base):
   hashed_password = Column(String(100), nullable=False)
   email = Column(String(100), unique=True, nullable=False)
   created_at = Column(DateTime, default=func.now())
-  
+  avatar_url = Column(String(500), nullable = True)
+
   
