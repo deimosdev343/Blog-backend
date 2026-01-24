@@ -9,3 +9,6 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
   username: str
   password: str
+
+class updateAvatar(BaseModel):
+  avatar_url: str

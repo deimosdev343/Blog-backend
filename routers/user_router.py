@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from dto.user_dto import UserCreate, UserLogin
+from dto.user_dto import UserCreate, UserLogin, updateAvatar
 from models.user_model import UserModel
 from database import SessionLocal
 from utils.hash import hash_password, verify_password
 from utils.auth import create_access_token
-
+from utils.auth_scheme import get_current_user
+from sqlalchemy import update
 router = APIRouter(
   prefix="/user",
   tags=["user"]
@@ -46,4 +47,21 @@ def login(user_login:UserLogin, db: Session = Depends(get_db)):
   token = create_access_token({"username":user.username, "email":user.email, "id": user.id})
   return {"access_token":token, "token_type":"bearer"}
 
+
+@router.put("/update_avatar")
+def update_avatar(
+  user_avatar: updateAvatar, 
+  db: Session = Depends(get_db),
+  user = Depends(get_current_user)
+):
+  stmt = (
+    update(UserModel)
+    .where(UserModel.id == user["id"])
+    .values(avatar_url = user_avatar.avatar_url)
+  )
+  result = db.execute(stmt)
+  db.commit()
+  return {"msg":"avatar updated successfully"}
+  
+  
 
