@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models.post_model import Post 
+from models.user_model import UserModel
+
 from database import SessionLocal
 from dto.post_dto import PostCreate
 from utils.auth_scheme import get_current_user
@@ -19,11 +21,15 @@ def get_db():
 @router.post("/")
 def create_post(post: PostCreate, db: Session = Depends(get_db), user = Depends(get_current_user)):
     
+    user_data = db.query(UserModel).filter(UserModel.username == user["username"]).first()
     db_post = Post(
         author_id= user["id"],
         title=post.title,
-        content=post.content
+        content=post.content,
+        username=user["username"],
+        user_avatar= user_data.avatar_url
     )
+    
     db.add(db_post)
     db.commit()
     return {"msg":"post created successfully"}

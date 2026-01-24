@@ -10,6 +10,8 @@ class Post(Base):
   author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
   title = Column(String(100), nullable=False)
   content = Column(Text(300000), nullable=False)
+  username = Column(String(100), nullable= False)
+  user_avatar = Column(String(500), nullable=True)
   created_at = Column(DateTime, default=func.now())
   updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
   
