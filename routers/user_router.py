@@ -20,6 +20,11 @@ def get_db():
     db.close()
     
 
+@router.get('/auth')
+def auth(user = Depends(get_current_user)):
+  return user;
+  
+
 @router.post('/register')
 def register(user: UserCreate, db: Session = Depends(get_db)):
   existing_user = db.query(UserModel).filter(UserModel.username == user.username).first()
@@ -45,7 +50,11 @@ def login(user_login:UserLogin, db: Session = Depends(get_db)):
     raise HTTPException(status_code=401, detail="invalid username or password")
   
   token = create_access_token({"username":user.username, "email":user.email, "id": user.id})
-  return {"access_token":token, "token_type":"bearer"}
+  return {
+    "access_token":token,  
+    "token_type":"bearer",
+    "user_data": {"username":user.username, "email":user.email, "id": user.id}
+  }
 
 
 @router.put("/update_avatar")
