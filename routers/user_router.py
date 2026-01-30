@@ -5,7 +5,7 @@ from models.user_model import UserModel
 from database import SessionLocal
 from utils.hash import hash_password, verify_password
 from utils.auth import create_access_token
-from utils.auth_scheme import get_current_user
+from utils.auth_scheme import get_current_user, blacklist_token
 from sqlalchemy import update
 router = APIRouter(
   prefix="/user",
@@ -23,7 +23,10 @@ def get_db():
 @router.get('/auth')
 def auth(user = Depends(get_current_user)):
   return user;
-  
+
+@router.get('/logout')
+def logout(user = Depends(blacklist_token)):
+  return {"msg":"logged out successfully"};  
 
 @router.post('/register')
 def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -51,7 +54,7 @@ def login(user_login:UserLogin, db: Session = Depends(get_db)):
   
   token = create_access_token({"username":user.username, "email":user.email, "id": user.id})
   return {
-    "access_token":token,  
+    "access_token":token,
     "token_type":"bearer",
     "user_data": {"username":user.username, "email":user.email, "id": user.id}
   }
