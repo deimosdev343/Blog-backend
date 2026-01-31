@@ -61,10 +61,10 @@ def login(user_login:UserLogin, db: Session = Depends(get_db)):
   }
 
 
-def update_avatar_in_posts(user_id, avatar_url, db: Session = Depends(get_current_user)):
+def update_avatar_in_posts(user_id, avatar_url, db: Session):
   stmt = (update(Post)
           .where(Post.author_id == user_id)
-          .values(avatar_url= avatar_url))
+          .values(user_avatar= avatar_url))
   db.execute(stmt)
   db.commit()
   
@@ -83,8 +83,11 @@ def update_avatar(
   
   result = db.execute(stmt)
   db.commit()
-  background_tasks.add_task(update_avatar_in_posts, user["id"], user_avatar.avatar_url)
-  
+  background_tasks.add_task(
+    update_avatar_in_posts, 
+    user_id = user["id"], avatar_url = user_avatar.avatar_url, 
+    db=db
+  )
   
   return {"msg":"avatar updated successfully"}
   
