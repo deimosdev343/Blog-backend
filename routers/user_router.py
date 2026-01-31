@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from dto.user_dto import UserCreate, UserLogin, updateAvatar
 from models.user_model import UserModel
+from models.post_model import Post
 from database import SessionLocal
 from utils.hash import hash_password, verify_password
 from utils.auth import create_access_token
@@ -60,19 +61,31 @@ def login(user_login:UserLogin, db: Session = Depends(get_db)):
   }
 
 
+def update_avatar_in_posts(user_id, avatar_url, db: Session = Depends(get_current_user)):
+  stmt = (update(Post)
+          .where(Post.author_id == user_id)
+          .values(avatar_url= avatar_url))
+  db.execute(stmt)
+  db.commit()
+  
 @router.put("/update_avatar")
 def update_avatar(
   user_avatar: updateAvatar, 
+  background_tasks: BackgroundTasks,
   db: Session = Depends(get_db),
-  user = Depends(get_current_user)
+  user = Depends(get_current_user),
 ):
   stmt = (
     update(UserModel)
     .where(UserModel.id == user["id"])
     .values(avatar_url = user_avatar.avatar_url)
   )
+  
   result = db.execute(stmt)
   db.commit()
+  background_tasks.add_task(update_avatar_in_posts, user["id"], user_avatar.avatar_url)
+  
+  
   return {"msg":"avatar updated successfully"}
   
   
