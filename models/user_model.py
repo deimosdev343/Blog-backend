@@ -1,15 +1,16 @@
-from sqlalchemy import Column, Integer, String, DateTime, Table,ForeignKey, func
+from sqlalchemy import Column, Integer, String, DateTime, Table,ForeignKey, UniqueConstraint, func
 from sqlalchemy.orm import relationship
 from database import Base
 
 
-#блять как же я тут наваснила
+#блять как же я тут навасанила
 
 followers = Table(
   'followers',
   Base.metadata,
   Column('follower_id', Integer, ForeignKey('users.id'), primary_key=True),
-  Column('followed_id', Integer, ForeignKey('users.id'), primary_key=True)
+  Column('followed_id', Integer, ForeignKey('users.id'), primary_key=True),
+  UniqueConstraint("follower_id", "followed_id", name="uq_follows")
 )
 
 class UserModel(Base):
