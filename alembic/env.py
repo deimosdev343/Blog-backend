@@ -3,7 +3,9 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-import models
+import models.following_model
+import models.post_model
+import models.user_model
 import os
 from alembic import context
 from dotenv import load_dotenv
