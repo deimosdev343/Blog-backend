@@ -23,7 +23,7 @@ class UserModel(Base):
   avatar_url = Column(String(500), nullable = True)
   
   following = relationship(
-    "users",
+    "UserModel",
     secondary=followers,
     primaryjoin=(followers.c.follower_id == id),
     secondaryjoin=(followers.c.followed_id == id),
