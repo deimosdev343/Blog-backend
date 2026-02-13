@@ -21,6 +21,7 @@ class UserModel(Base):
   email = Column(String(100), unique=True, nullable=False)
   created_at = Column(DateTime, default=func.now())
   avatar_url = Column(String(500), nullable = True)
+  description = Column(String(10000), nullable= True)
   
   following = relationship(
     "UserModel",
