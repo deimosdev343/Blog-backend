@@ -68,6 +68,21 @@ def update_avatar_in_posts(user_id, avatar_url, db: Session):
   db.execute(stmt)
   db.commit()
 
+@router.get("/{user_id}")
+def get_specific_user(
+  user_id: int,
+  db: Session = Depends(get_db)
+):
+  existing_user = db.query(UserModel).filter(UserModel.id == user_id).first()
+  if not existing_user:
+    raise HTTPException(404, "User not found")
+  return {
+    "username":existing_user.username,
+    "avatar_url": existing_user.avatar_url,
+    "description": existing_user.description
+  }
+
+  
 @router.put("/update_info")
 def update_info(
   user_details: updateUserDetails,
