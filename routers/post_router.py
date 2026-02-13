@@ -18,6 +18,7 @@ def get_db():
     finally:
         db.close()
 
+
 @router.post("/")
 def create_post(post: PostCreate, db: Session = Depends(get_db), user = Depends(get_current_user)):
     
@@ -47,3 +48,17 @@ def get_posts(
             .all()
     )
     
+@router.get("/{user_id}")
+def get_posts_for_user(
+    user_id: int,
+    skip:int = 0,
+    limit: int = 10,
+    db: Session = Depends(get_db)):
+    return (
+        db.query(Post)
+            .filter(Post.author_id == user_id )
+            .order_by(Post.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+    ) 
