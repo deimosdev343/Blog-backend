@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
-from dto.user_dto import UserCreate, UserLogin, updateAvatar
+from dto.user_dto import UserCreate, UserLogin, updateAvatar, updateUserDetails
 from models.user_model import UserModel
 from models.post_model import Post
 from database import SessionLocal
@@ -67,7 +67,22 @@ def update_avatar_in_posts(user_id, avatar_url, db: Session):
           .values(user_avatar= avatar_url))
   db.execute(stmt)
   db.commit()
-  
+
+@router.put("/update_info")
+def update_info(
+  user_details: updateUserDetails,
+  db: Session = Depends(get_db),
+  user = Depends(get_current_user)
+):
+  stmt = (
+    update(UserModel)
+    .where(UserModel.id == user["id"])
+    .values(description = user_details.description)
+  )
+  result = db.execute(stmt)
+  db.commit()
+  return {"msg":"avatar updated successfully"}
+
 @router.put("/update_avatar")
 def update_avatar(
   user_avatar: updateAvatar, 

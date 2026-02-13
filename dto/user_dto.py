@@ -12,3 +12,7 @@ class UserLogin(BaseModel):
 
 class updateAvatar(BaseModel):
   avatar_url: str
+  
+
+class updateUserDetails(BaseModel):
+  description: str
