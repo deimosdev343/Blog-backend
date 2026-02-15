@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models.post_model import Post 
 from models.user_model import UserModel
-
+from routers.userposts import userposts_router
 from database import SessionLocal
 from dto.post_dto import PostCreate
 from utils.auth_scheme import get_current_user

@@ -8,10 +8,13 @@ from utils.hash import hash_password, verify_password
 from utils.auth import create_access_token
 from utils.auth_scheme import get_current_user, blacklist_token
 from sqlalchemy import update
+from routers.userposts import userposts_router
 router = APIRouter(
   prefix="/user",
   tags=["user"]
 )
+
+router.include_router(userposts_router.router)
 
 def get_db():
   db = SessionLocal()
