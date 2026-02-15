@@ -18,6 +18,17 @@ def get_db():
   finally:
     db.close()
 
-@router.get('/getPosts')
-def test():
-  return {"msg":"test"}
+@router.get('/{user_id}')
+def get_posts_for_user(
+    user_id: int,
+    skip:int = 0,
+    limit: int = 10,
+    db: Session = Depends(get_db)):
+    return (
+        db.query(Post)
+            .filter(Post.author_id == user_id )
+            .order_by(Post.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+    ) 

@@ -47,18 +47,3 @@ def get_posts(
             .limit(limit)
             .all()
     )
-    
-@router.get("/{user_id}")
-def get_posts_for_user(
-    user_id: int,
-    skip:int = 0,
-    limit: int = 10,
-    db: Session = Depends(get_db)):
-    return (
-        db.query(Post)
-            .filter(Post.author_id == user_id )
-            .order_by(Post.created_at.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-    ) 
