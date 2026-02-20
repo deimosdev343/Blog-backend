@@ -2,12 +2,21 @@ from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
 from routers import user_router, post_router
 from database import Base, engine
+from fastapi.middleware.cors import CORSMiddleware
 load_dotenv()
 
 app = FastAPI()
 
-Base.metadata.create_all(bind=engine)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+Base.metadata.create_all(bind=engine)
 app.include_router(user_router.router)
 app.include_router(post_router.router)
 
