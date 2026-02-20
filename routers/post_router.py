@@ -47,3 +47,15 @@ def get_posts(
             .limit(limit)
             .all()
     )
+    
+
+@router.get("/{post_id}")
+def get_post(
+    post_id:int,
+    db: Session = Depends(get_db)
+):
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if not post:
+        return HTTPException(status_code=404, detail="Post not found");
+    return post
+
