@@ -23,24 +23,25 @@ def get_db():
     db.close()
 
 
-@router.post("/{user_id}")
+@router.post("/follow/{user_id}")
 def follow_user(user_id: int,
                 db: Session = Depends(get_db),
                 current_user = Depends(get_current_user)
 ):
-  if current_user.id == user_id:
+  print(current_user['id'])
+  if current_user["id"] == user_id:
     raise HTTPException(status_code=400, detail="You can't follow yourself");
   
   target_user = db.query(UserModel).filter(UserModel.id == user_id).first()
   if not target_user:
     raise HTTPException(status_code=404, detail="User Not Found");
   
+  
   stmt = insert(followers).values(
-      follower_id=current_user.id,
+      follower_id=current_user['id'],
       followed_id=user_id
   )
   db.execute(stmt)
   db.commit()
   return {"msg":"followed"}
-  
   
