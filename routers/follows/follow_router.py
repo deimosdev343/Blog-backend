@@ -7,7 +7,7 @@ from database import SessionLocal
 from utils.hash import hash_password, verify_password
 from utils.auth import create_access_token
 from utils.auth_scheme import get_current_user, blacklist_token
-from sqlalchemy import update, insert
+from sqlalchemy import update, insert, delete
 from routers.userposts import userposts_router
 
 router = APIRouter(
@@ -45,3 +45,17 @@ def follow_user(user_id: int,
   db.commit()
   return {"msg":"followed"}
   
+@router.delete("/follow/{user_id}")
+def unfollow_user(
+  user_id:int,
+  db: Session = Depends(get_db),
+  current_user = Depends(get_current_user)
+):
+  stmt = delete(followers).where(
+    followers.c.follower_id == current_user["id"],
+    followers.c.followed_id == user_id
+  )
+  result = db.execute(stmt)
+  db.commit()
+  
+  return {"msg":"unfollowed"}
