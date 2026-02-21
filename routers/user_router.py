@@ -9,12 +9,16 @@ from utils.auth import create_access_token
 from utils.auth_scheme import get_current_user, blacklist_token
 from sqlalchemy import update
 from routers.userposts import userposts_router
+from routers.follows import follow_router;
+
 router = APIRouter(
   prefix="/user",
   tags=["user"]
 )
 
 router.include_router(userposts_router.router)
+router.include_router(follow_router.router)
+
 
 def get_db():
   db = SessionLocal()
