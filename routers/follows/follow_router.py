@@ -8,7 +8,7 @@ from database import SessionLocal
 from utils.hash import hash_password, verify_password
 from utils.auth import create_access_token
 from utils.auth_scheme import get_current_user, blacklist_token
-from sqlalchemy import update, insert, delete, select
+from sqlalchemy import update, insert, delete, select, func
 from routers.userposts import userposts_router
 
 router = APIRouter(
@@ -65,8 +65,9 @@ def unfollow_user(
 
 @router.get("/{user_id}/is-following")
 def is_following(user_id: int,
-                db: Session = Depends(get_db),
-                current_user: UserModel = Depends(get_current_user)):
+  db: Session = Depends(get_db),
+  current_user = Depends(get_current_user)
+):
 
   stmt = select(followers).where(
       followers.c.follower_id == current_user.id,
@@ -74,3 +75,19 @@ def is_following(user_id: int,
   )
 
   return {"is_following": db.execute(stmt).first() is not None}
+
+@router.get("/{user_id}/follow-stats")
+def get_follow_stats(user_id: int, db: Session = Depends(get_db)):
+
+    followers_count = db.execute(
+        select(func.count()).where(followers.c.followed_id == user_id)
+    ).scalar()
+
+    following_count = db.execute(
+        select(func.count()).where(followers.c.follower_id == user_id)
+    ).scalar()
+
+    return {
+        "followers": followers_count,
+        "following": following_count
+    }
