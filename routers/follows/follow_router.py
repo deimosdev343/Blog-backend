@@ -12,8 +12,8 @@ from sqlalchemy import update, insert, delete
 from routers.userposts import userposts_router
 
 router = APIRouter(
-  prefix="/follows",
-  tags=["follows"]
+  prefix="/follow",
+  tags=["follow"]
 );
 
 def get_db():
