@@ -8,7 +8,7 @@ from database import SessionLocal
 from utils.hash import hash_password, verify_password
 from utils.auth import create_access_token
 from utils.auth_scheme import get_current_user, blacklist_token
-from sqlalchemy import update, insert, delete
+from sqlalchemy import update, insert, delete, select
 from routers.userposts import userposts_router
 
 router = APIRouter(
@@ -60,3 +60,17 @@ def unfollow_user(
   db.commit()
   
   return {"msg":"unfollowed"}
+
+
+
+@router.get("/{user_id}/is-following")
+def is_following(user_id: int,
+                db: Session = Depends(get_db),
+                current_user: UserModel = Depends(get_current_user)):
+
+  stmt = select(followers).where(
+      followers.c.follower_id == current_user.id,
+      followers.c.followed_id == user_id
+  )
+
+  return {"is_following": db.execute(stmt).first() is not None}
