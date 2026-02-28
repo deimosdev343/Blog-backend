@@ -24,7 +24,7 @@ def get_db():
     db.close()
 
 
-@router.post("/follow")
+@router.post("/")
 def follow_user(follow: FollowUser,
                 db: Session = Depends(get_db),
                 current_user = Depends(get_current_user)
