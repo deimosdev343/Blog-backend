@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 router.include_router(userposts_router.router)
-router.include_router(follow_router.router)
+
 
 
 def get_db():
