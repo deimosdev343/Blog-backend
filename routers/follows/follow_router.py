@@ -24,7 +24,7 @@ def get_db():
     db.close()
 
 
-@router.post("/follow")
+@router.post("/")
 def follow_user(follow: FollowUser,
                 db: Session = Depends(get_db),
                 current_user = Depends(get_current_user)
@@ -46,7 +46,7 @@ def follow_user(follow: FollowUser,
   db.commit()
   return {"msg":"followed"}
   
-@router.delete("/follow/{user_id}")
+@router.delete("/{user_id}")
 def unfollow_user(
   user_id:int,
   db: Session = Depends(get_db),
