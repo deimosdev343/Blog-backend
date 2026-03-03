@@ -61,13 +61,14 @@ def get_post(
     return post
 
 
-@router.get("/feed")
+@router.get("/following/feed")
 def get_feed(
     skip: int = 0,
     limit: int = 10,
     db: Session = Depends(get_db), 
     user = Depends(get_current_user)
-):
+):  
+    
     stmt = (
         select(Post)
         .join(followers, followers.c.followed_id == Post.author_id)
