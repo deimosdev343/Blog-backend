@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from models.post_model import Post 
-from models.user_model import UserModel
+from models.user_model import UserModel, followers
 from routers.userposts import userposts_router
 from database import SessionLocal
 from dto.post_dto import PostCreate
@@ -59,3 +60,24 @@ def get_post(
         raise HTTPException(status_code=404, detail="Post not found");
     return post
 
+
+@router.get("/feed")
+def get_feed(
+    skip: int = 0,
+    limit: int = 10,
+    db: Session = Depends(get_db), 
+    user = Depends(get_current_user)
+):
+    followed_subquery = (
+        select(followers.c.followed_id)
+        .where(followers.c.follower_id == user["id"])
+    )
+    stmt = (
+        select(Post)
+        .where(Post.author_id .in_(followed_subquery))
+        .order_by(Post.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+    posts = db.execute(stmt).scalars().all()
+    return posts
