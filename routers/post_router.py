@@ -68,13 +68,10 @@ def get_feed(
     db: Session = Depends(get_db), 
     user = Depends(get_current_user)
 ):
-    followed_subquery = (
-        select(followers.c.followed_id)
-        .where(followers.c.follower_id == user["id"])
-    )
     stmt = (
         select(Post)
-        .where(Post.author_id .in_(followed_subquery))
+        .join(followers, followers.c.followed_id == Post.author_id)
+        .where(followers.c.follower_id == user["id"])
         .order_by(Post.created_at.desc())
         .offset(skip)
         .limit(limit)
