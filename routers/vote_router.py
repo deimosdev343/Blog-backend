@@ -25,10 +25,22 @@ def get_db():
 @router.post("/${post_id}")
 def vote(
   post_id: int,
+  vote: int,
   db: Session = Depends(get_db),
   user = Depends(get_current_user)
 ):
   post = db.query(Post).filter(Post.id == post_id).first()
   if not post:
     raise HTTPException(status_code=404, detail="Post not found")
+  
+  if vote not in [-1, 1]:
+    raise HTTPException(400, "Vote must be -1, or 1")
+  
+  stmt = select(PostVote).where(
+      PostVote.user_id == user["id"],
+      PostVote.post_id == post_id
+  )
+
+  existing_vote = db.execute(stmt).scalar_one_or_none()
+  
   
