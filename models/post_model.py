@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Boolean,DateTime, func, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Boolean,DateTime, func, Text, ForeignKey, UniqueConstraint 
 from sqlalchemy.orm import relationship 
 from database import Base
 
@@ -15,3 +15,12 @@ class Post(Base):
   created_at = Column(DateTime, default=func.now())
   updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
   
+class PostVote(Base):
+  __tablename__ = "post_votes"
+  user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+  post_id = Column(Integer, ForeignKey("posts.id"), primary_key=True)
+  vote = Column(Integer)
+  
+  __table_args__ = (
+    UniqueConstraint("user_id", "post_id", name="uq_user_post_vote"),
+  )
