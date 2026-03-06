@@ -1,0 +1,34 @@
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from sqlalchemy.orm import Session
+from dto.user_dto import UserCreate, UserLogin, updateAvatar, updateUserDetails
+from dto.folllow_dto import FollowUser
+from models.user_model import UserModel, followers
+from models.post_model import Post, PostVote
+from database import SessionLocal
+from utils.hash import hash_password, verify_password
+from utils.auth import create_access_token
+from utils.auth_scheme import get_current_user, blacklist_token
+from sqlalchemy import update, insert, delete, select, func
+from routers.userposts import userposts_router
+
+router = APIRouter(
+  prefix="/vote"
+)
+
+def get_db():
+  db = SessionLocal()
+  try:
+    yield db
+  finally:
+    db.close()
+
+@router.post("/${post_id}")
+def vote(
+  post_id: int,
+  db: Session = Depends(get_db),
+  user = Depends(get_current_user)
+):
+  post = db.query(Post).filter(Post.id == post_id).first()
+  if not post:
+    raise HTTPException(status_code=404, detail="Post not found")
+  

@@ -57,7 +57,7 @@ def get_post(
 ):
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:
-        raise HTTPException(status_code=404, detail="Post not found");
+        raise HTTPException(status_code=404, detail="Post not found")
     return post
 
 
