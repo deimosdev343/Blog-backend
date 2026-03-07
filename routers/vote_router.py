@@ -32,15 +32,24 @@ def vote(
   post = db.query(Post).filter(Post.id == post_id).first()
   if not post:
     raise HTTPException(status_code=404, detail="Post not found")
-  
   if vote not in [-1, 1]:
     raise HTTPException(400, "Vote must be -1, or 1")
-  
   stmt = select(PostVote).where(
       PostVote.user_id == user["id"],
       PostVote.post_id == post_id
   )
-
   existing_vote = db.execute(stmt).scalar_one_or_none()
-  
+  if existing_vote:
+    db.delete(existing_vote)
+    if existing_vote.vote == vote:
+      return {"msg":"vote successfully removed"}
+  db.add(PostVote(
+    user_id = user["id"],
+    post_id = post_id,
+    vote = vote
+  ))
+  db.commit()
+  return {"msg":"vote updated"};
+   
+    
   
