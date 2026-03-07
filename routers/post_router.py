@@ -93,14 +93,36 @@ def get_feed(
     db: Session = Depends(get_db), 
     user = Depends(get_current_user)
 ):  
-    
     stmt = (
-        select(Post)
+        select(
+            Post,
+            func.sum(
+                case((PostVote.vote == 1, 1), else_=0),
+            ).label("upvotes"),
+            func.sum(
+                case((PostVote.vote == -1, 1), else_=0),
+            ).label("downvotes"),
+        )
         .join(followers, followers.c.followed_id == Post.author_id)
+        .outerjoin(PostVote, PostVote.post_id == Post.id)
         .where(followers.c.follower_id == user["id"])
+        .group_by(Post.id)
         .order_by(Post.created_at.desc())
         .offset(skip)
         .limit(limit)
     )
-    posts = db.execute(stmt).scalars().all()
+    results = db.execute(stmt).all()
+    posts = []
+    for post, upvotes, downvotes in results:
+        posts.append({
+            "id": post.id,
+            "title": post.title,
+            "content": post.content,
+            "author_id": post.author_id,
+            "username": post.username,
+            "user_avatar": post.user_avatar,
+            "created_at": post.created_at,
+            "upvotes": upvotes,
+            "downvotes": downvotes
+        })
     return posts
