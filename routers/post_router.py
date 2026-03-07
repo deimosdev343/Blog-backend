@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import select, func
+from sqlalchemy import select, func, case
 from models.post_model import Post, PostVote
 from models.user_model import UserModel, followers
 from routers.userposts import userposts_router
@@ -45,7 +45,12 @@ def get_posts(
     stmt = (
         select(
             Post,
-            func.coalesce(func.sum(PostVote.vote), 0).label("score"),
+            func.sum(
+                case((PostVote.vote == 1, 1), else_=0),
+            ).label("upvotes"),
+            func.sum(
+                case((PostVote.vote == -1, 1), else_=0),
+            ).label("downvotes"),
         )
         .outerjoin(PostVote, PostVote.post_id == Post.id)
         .group_by(Post.id)
@@ -55,7 +60,7 @@ def get_posts(
     )
     results = db.execute(stmt).all()
     posts = []
-    for post, score in results:
+    for post, upvotes, downvotes in results:
         posts.append({
             "id": post.id,
             "title": post.title,
@@ -64,7 +69,8 @@ def get_posts(
             "username": post.username,
             "user_avatar": post.user_avatar,
             "created_at": post.created_at,
-            "score": score
+            "upvotes": upvotes,
+            "downvotes": downvotes
         })
     
     return posts
