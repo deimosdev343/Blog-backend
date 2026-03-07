@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import select
-from models.post_model import Post 
+from sqlalchemy import select, func
+from models.post_model import Post, PostVote
 from models.user_model import UserModel, followers
 from routers.userposts import userposts_router
 from database import SessionLocal
@@ -41,14 +41,33 @@ def get_posts(
     skip:int = 0, 
     limit: int = 10,
     db: Session = Depends(get_db)):
-    return (
-        db.query(Post)
-            .order_by(Post.created_at.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-    )
     
+    stmt = (
+        select(
+            Post,
+            func.coalesce(func.sum(PostVote.vote), 0).label("score"),
+        )
+        .outerjoin(PostVote, PostVote.post_id == Post.id)
+        .group_by(Post.id)
+        .order_by(Post.created_at.desc())
+        .limit(limit)
+        .offset(skip)
+    )
+    results = db.execute(stmt).all()
+    posts = []
+    for post, score in results:
+        posts.append({
+            "id": post.id,
+            "title": post.title,
+            "content": post.content,
+            "author_id": post.author_id,
+            "username": post.username,
+            "user_avatar": post.user_avatar,
+            "created_at": post.created_at,
+            "score": score
+        })
+    
+    return posts
 
 @router.get("/{post_id}")
 def get_post(
