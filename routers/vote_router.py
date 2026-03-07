@@ -34,6 +34,7 @@ def vote(
   if existing_vote:
     db.delete(existing_vote)
     if existing_vote.vote == new_vote.vote:
+      db.commit()
       return {"msg":"vote successfully removed"}
   db.add(PostVote(
     user_id = user["id"],
