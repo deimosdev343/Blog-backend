@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from models.post_model import Post, PostVote
 from database import SessionLocal
-from utils.auth_scheme import get_current_user, blacklist_token
-from sqlalchemy import update, insert, delete, select, func
+from utils.auth_scheme import get_current_user, blacklist_token, get_current_user_if_logged_in
+from sqlalchemy import update, insert, delete, select, func, case
 from dto.vote_dto import VoteDto
 
 router = APIRouter(
@@ -43,5 +43,33 @@ def vote(
   ))
   db.commit()
   return {"msg":"vote updated"};  
-  
+
+@router.get("/${post_id}")
+def get_post(
+  post_id :int,
+   db: Session = Depends(get_db),
+  user = Depends(get_current_user_if_logged_in)
+):
+   if(user):   
+    user_id = user["id"]
+    stmt = (
+          select(
+              func.sum(
+                  case((PostVote.vote == 1, 1), else_=0)
+              ).label("upvotes"),
+
+              func.sum(
+                  case((PostVote.vote == -1, 1), else_=0)
+              ).label("downvotes"),
+
+              func.max(
+                  case(
+                      (PostVote.user_id == user_id, PostVote.vote),
+                      else_=0
+                  )
+              ).label("user_vote")
+          )
+          .where(PostVote.post_id == post_id)
+      )
+
   
