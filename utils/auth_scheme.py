@@ -17,3 +17,8 @@ def get_current_user(token: str = Depends(auth_scheme)):
 def blacklist_token(token: str = Depends(auth_scheme)):
   blocked_tokens.append(token) 
 
+def get_current_user_if_logged_in(token: str = Depends(auth_scheme)):
+  if token in blocked_tokens: 
+    raise HTTPException(status_code=403, detail="Invalid or expired Token")
+  payload = decode_access_token(token)
+  return payload
