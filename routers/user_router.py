@@ -16,6 +16,7 @@ router = APIRouter(
   tags=["user"]
 )
 
+
 router.include_router(userposts_router.router)
 
 
@@ -52,7 +53,8 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
   return {"msg":"user successfully registered"};
 
 @router.post("/login")
-def login(user_login:UserLogin, db: Session = Depends(get_db)):
+
+def login(request, user_login:UserLogin, db: Session = Depends(get_db)):
   user = db.query(UserModel).filter(UserModel.username == user_login.username).first()
   if not user: 
     raise HTTPException(status_code=401, detail="Invalid username or password")
