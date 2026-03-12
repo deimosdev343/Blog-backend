@@ -44,31 +44,38 @@ def vote(
   db.commit()
   return {"msg":"vote updated"};  
 
-@router.get("/${post_id}")
+@router.get("/")
 def get_post(
   post_id :int,
   db: Session = Depends(get_db),
   user = Depends(get_current_user_if_logged_in)
 ):
-   if(user):   
-    user_id = user["id"] if user else None
-    
+  stmt = None
+  if(user):   
+    user_id = user["id"]
     stmt = (
-          select(
-            func.sum(case((PostVote.vote == 1, 1), else_=0)).label("upvotes"),
-            func.sum(case((PostVote.vote == -1, 1), else_=0)).label("downvotes"),
-            func.max(case((PostVote.user_id == user_id, PostVote.vote),else_=0)).label("user_vote")
-          )
-          .where(PostVote.post_id == post_id)
+      select(
+        func.sum(case((PostVote.vote == 1, 1), else_=0)).label("upvotes"),
+        func.sum(case((PostVote.vote == -1, 1), else_=0)).label("downvotes"),
+        func.max(case((PostVote.user_id == user_id, PostVote.vote),else_=0)).label("user_vote")
       )
-    result = db.execute(stmt).first()
-    upvotes = result.upvotes or 0
-    downvotes = result.downvotes or 0
-    return {
-      "post_id": post_id,
-      "upvotes": upvotes,
-      "downvotes": downvotes,
-      "score":upvotes - downvotes,
-      "user_votes": result.user_vote or 0
-    }
+      .where(PostVote.post_id == post_id)
+    )
+  else:
+    stmt = (
+        select(
+          func.sum(case((PostVote.vote == 1, 1), else_=0)).label("upvotes"),
+          func.sum(case((PostVote.vote == -1, 1), else_=0)).label("downvotes"),
+        )
+        .where(PostVote.post_id == post_id)
+    )
+  result = db.execute(stmt).first()
+  upvotes = result.upvotes or 0
+  downvotes = result.downvotes or 0
+  return {
+    "post_id": post_id,
+    "upvotes": upvotes,
+    "downvotes": downvotes,
+    "score":upvotes - downvotes,
+  }
   
