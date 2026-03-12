@@ -47,7 +47,7 @@ def vote(
 @router.get("/${post_id}")
 def get_post(
   post_id :int,
-   db: Session = Depends(get_db),
+  db: Session = Depends(get_db),
   user = Depends(get_current_user_if_logged_in)
 ):
    if(user):   
