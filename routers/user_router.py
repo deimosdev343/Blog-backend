@@ -11,6 +11,7 @@ from sqlalchemy import update
 from routers.userposts import userposts_router
 from routers.follows import follow_router;
 from utils.limiter import limiter
+from fastapi import Request
 router = APIRouter(
   prefix="/user",
   tags=["user"]
@@ -54,7 +55,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login")
 @limiter.limit("5/minute")
-def login(request, user_login:UserLogin, db: Session = Depends(get_db)):
+def login(request: Request, user_login:UserLogin, db: Session = Depends(get_db)):
   user = db.query(UserModel).filter(UserModel.username == user_login.username).first()
   if not user: 
     raise HTTPException(status_code=401, detail="Invalid username or password")
