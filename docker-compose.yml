@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "mysql+pymysql://bloguser:FQQWfbRL!SNI@68.183.192.23:3306/blog_db"
+      ALGORITHM: "HS256"
+      SECRET_KEY: "BADSECRET"
+      ACCESS_TOKEN_EXPIRE_MINUTES: 12000
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000"
+
+  
