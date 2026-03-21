@@ -31,7 +31,6 @@ class PostComment(Base):
   id = Column(Integer, primary_key=True)
   post_id = Column(Integer, ForeignKey("posts.id"), primary_key=True)
   author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-  title = Column(String(100), nullable=False)
   content = Column(Text(300000), nullable=False)
   username = Column(String(100), nullable= False)
   user_avatar = Column(String(500), nullable=True)
