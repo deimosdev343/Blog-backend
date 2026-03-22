@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class VoteDto(BaseModel):
+class CommentDto(BaseModel):
   post_id: int
   content: str
   

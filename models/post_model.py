@@ -27,7 +27,6 @@ class PostVote(Base):
   
 class PostComment(Base):
   __tablename__ = "post_comments"
-  
   id = Column(Integer, primary_key=True)
   post_id = Column(Integer, ForeignKey("posts.id"), primary_key=True)
   author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
