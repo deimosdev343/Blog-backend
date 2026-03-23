@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
-from routers import user_router, post_router, follow_router, vote_router
+from routers import user_router, post_router, follow_router, vote_router, comment_router
 from database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from utils.limiter import limiter
@@ -28,7 +28,7 @@ app.include_router(user_router.router)
 app.include_router(post_router.router)
 app.include_router(follow_router.router)
 app.include_router(vote_router.router)
-
+app.include_router(comment_router.router)
 @app.get("/")
 def root():
     return {"message":"Backend API"}
