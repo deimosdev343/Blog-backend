@@ -20,10 +20,18 @@ def get_db():
 @router.get("/{post_id}")
 def get_post_comments(
   post_id: int,
+  limit: int = 10,
+  skip: int = 0,
   db: Session = Depends(get_db)
 ):
-  comments = db.query(PostComment).filter(PostComment.post_id == post_id).first()
-  return comments;
+  stmt = (
+    select(PostComment)
+    .where(PostComment.post_id == post_id)
+    .order_by(PostComment.created_at.desc())
+    .offset(skip)
+    .limit(limit))
+  comments = db.execute(stmt).scalars().all();
+  return {"comments": comments};
 
 @router.post("/")
 def create_post_comment(
@@ -43,6 +51,4 @@ def create_post_comment(
     username = current_user["username"],
     user_avatar = user_data.avatar_url
   ));
-  db.commit()
-  return {"msg":"commment created successfully"}
   
