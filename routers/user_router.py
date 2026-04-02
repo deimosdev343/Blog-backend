@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from dto.user_dto import UserCreate, UserLogin, updateAvatar, updateUserDetails
 from models.user_model import UserModel
-from models.post_model import Post
+from models.post_model import Post, PostComment
 from database import SessionLocal
 from utils.hash import hash_password, verify_password
 from utils.auth import create_access_token
@@ -75,6 +75,10 @@ def update_avatar_in_posts(user_id, avatar_url, db: Session):
   stmt = (update(Post)
           .where(Post.author_id == user_id)
           .values(user_avatar= avatar_url))
+  db.execute(stmt)
+  stmt = (update(PostComment)
+          .where(PostComment.author_id == user_id)
+          .values(avatar_url = avatar_url))
   db.execute(stmt)
   db.commit()
 
