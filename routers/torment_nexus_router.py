@@ -26,24 +26,28 @@ def get_db():
 @router.post("/suggests")
 def get_suggestions(data: SuggestTextInput):
   prompt = f"""
-  Generate 3 short, natural, and engaging social media reply comments 
-  to the following post. Keep them casual and varied in tone.
+    You are a writing assistant helping a user continue their article.
 
-  Post:
-  "{data.post}"
+    Given the text below, generate 3 distinct suggestions for what the writer could write next.
 
-  Return as a JSON array of strings.
+    Guidelines:
+    - Each suggestion should be 1–2 sentences max
+    - Continue naturally from the tone and topic
+    - Each suggestion should take a slightly different direction (e.g. example, argument, question, contrast, or storytelling)
+    - Do NOT repeat what was already written
+    - Do NOT summarize
+    - Do NOT write full paragraphs
+    - Keep it inspiring but practical
+    
+    return a list 
+
+    Post:
+    "{data.post}"
   """
   response = client.responses.create(
       model="gpt-4o",
       input=prompt
   )
   text_output = response.output[0].content[0].text
-  try:
-    import json
-    suggestions = json.loads(text_output)
-  except:
-    # fallback if model didn't return valid JSON
-    suggestions = [line.strip("- ").strip() for line in text_output.split("\n") if line.strip()]
-
-  return {"suggestions": suggestions}
+  text_output = text_output.replace("\n\n", "\n ")
+  return text_output
