@@ -1,4 +1,4 @@
 from pydantic import BaseModel
 
-class PostInput(BaseModel):
+class SuggestTextInput(BaseModel):
     post: str
