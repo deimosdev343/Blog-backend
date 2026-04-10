@@ -22,13 +22,15 @@ def get_db():
     finally:
         db.close()
 
-def get_last_paragraphs(text, n=2):
-    paragraphs = text.split("\n")
-    return "\n".join(paragraphs[-n:])
+def get_last_paragraphs(text, words=500):
+  split_words = text.split()
+  relevent_words = split_words[-500:]
+  return "".join(relevent_words)
+    
 
 @router.post("/suggests")
 def get_suggestions(data: SuggestTextInput):
-  last_paragraphs_output = last_paragraphs_output(data.post)
+  last_paragraphs_output = get_last_paragraphs(data.post)
   
   prompt = f"""
     You are a writing assistant helping a user continue their article.
