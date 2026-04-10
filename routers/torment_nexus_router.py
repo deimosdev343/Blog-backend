@@ -22,9 +22,14 @@ def get_db():
     finally:
         db.close()
 
+def get_last_paragraphs(text, n=2):
+    paragraphs = text.split("\n")
+    return "\n".join(paragraphs[-n:])
 
 @router.post("/suggests")
 def get_suggestions(data: SuggestTextInput):
+  last_paragraphs_output = last_paragraphs_output(data.post)
+  
   prompt = f"""
     You are a writing assistant helping a user continue their article.
 
@@ -42,7 +47,7 @@ def get_suggestions(data: SuggestTextInput):
     return a list 
 
     Post:
-    "{data.post}"
+    "{last_paragraphs_output}"
   """
   response = client.responses.create(
       model="gpt-4o",
