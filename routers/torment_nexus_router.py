@@ -9,6 +9,9 @@ from dto.suggest_text_dto import SuggestTextInput
 from config import TORMENT_NEXUS_KEY
 from utils.auth_scheme import get_current_user
 from openai import OpenAI
+import yake
+
+
 
 router = APIRouter(
   prefix="/ai",
@@ -26,12 +29,18 @@ def get_last_paragraphs(text, words=500):
   split_words = text.split()
   relevent_words = split_words[-words:]
   return "".join(relevent_words)
-    
+
+def extract_keywords(text):
+    kw_extractor = yake.KeywordExtractor(top=5)
+    keywords = kw_extractor.extract_keywords(text)
+    return [kw for kw, score in keywords]
 
 @router.post("/suggests")
 def get_suggestions(data: SuggestTextInput):
-  last_paragraphs_output = get_last_paragraphs(data.post, 500)
-  print(last_paragraphs_output);
+  last_paragraphs_output = get_last_paragraphs(data.post, 500);
+  keywords = extract_keywords(data.post);
+  print(keywords)
+  
   prompt = f"""
     You are a writing assistant helping a user continue their article.
 
