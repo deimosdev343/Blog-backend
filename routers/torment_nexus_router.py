@@ -45,7 +45,7 @@ def get_suggestions(data: SuggestTextInput):
     You are a writing assistant helping a user continue their article.
 
     Given the text below, generate 3 distinct suggestions for what the writer could write next.
-
+    
     Guidelines:
     - Each suggestion should be 1–2 sentences max
     - Continue naturally from the tone and topic
@@ -53,13 +53,15 @@ def get_suggestions(data: SuggestTextInput):
     - Do NOT repeat what was already written
     - Do NOT summarize
     - Do NOT write full paragraphs
-    - Keep it inspiring but practical
+    
     
     return a list 
 
+    context: {keywords}
     Post:
     "{last_paragraphs_output}"
   """
+  print(prompt)
   response = client.responses.create(
       model="gpt-4o",
       input=prompt
