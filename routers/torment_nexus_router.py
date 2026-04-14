@@ -37,7 +37,13 @@ def extract_keywords(text):
 
 @router.post("/suggests")
 def get_suggestions(data: SuggestTextInput):
-  last_paragraphs_output = get_last_paragraphs(data.post, 500);
+  
+  if not data.post:
+     raise HTTPException(status_code=401, detail="The post is empty")
+  
+  
+  last_paragraphs_output = data.post[-2500:]
+  
   keywords = extract_keywords(data.post);
   print(keywords)
   
