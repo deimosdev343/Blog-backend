@@ -10,7 +10,7 @@ from config import TORMENT_NEXUS_KEY
 from utils.auth_scheme import get_current_user
 from openai import OpenAI
 import yake
-
+import json
 
 
 router = APIRouter(
@@ -73,13 +73,15 @@ def get_suggestions_v2(data: SuggestTextInput):
       messages=[{"role": "user", "content": prompt}],
       response_format={"type": "json_object"}
     )
+    print(response.choices[0].message.content)
+    return json.loads(response.choices[0].message.content)  
   except Exception as e:
     print(e)
     raise HTTPException(status_code=500, detail="API Unavaliable")
-    
+
   # text_output = response.output[0].content[0].text
   # text_output = text_output.replace("\n\n", "\n ")
-  return response.choices[0].message.content  
+  
 
 @router.post("/suggests")
 def get_suggestions(data: SuggestTextInput):
