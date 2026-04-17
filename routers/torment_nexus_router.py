@@ -35,11 +35,58 @@ def extract_keywords(text):
     keywords = kw_extractor.extract_keywords(text)
     return [kw for kw, score in keywords]
 
+
+@router.post("/suggests/v2")
+async def get_suggestions_v2(data: SuggestTextInput): 
+  if not data.post.strip():
+     raise HTTPException(status_code=400, detail="The post is empty")
+  
+  
+  last_paragraphs_output = data.post[-2500:]
+  
+  keywords = extract_keywords(data.post);
+  print(keywords)
+  
+  prompt = f"""
+    You are a writing assistant helping a user continue their article.
+
+    Given the text below, generate 3 distinct suggestions for what the writer could write next.
+    
+    Guidelines:
+    - Each suggestion should be 1–2 sentences max
+    - Continue naturally from the tone and topic
+    - Each suggestion should take a slightly different direction (e.g. example, argument, question, contrast, or storytelling)
+    - Do NOT repeat what was already written
+    - Do NOT summarize
+    - Do NOT write full paragraphs
+    
+    
+    return a list 
+
+    context: {keywords}
+    Post:
+    "{last_paragraphs_output}"
+  """
+  print(prompt)
+  try:
+    response = await client.chat.completions.create(
+      model="gpt-4o",
+      messages=[{"role": "user", "content": prompt}],
+      response_format={"type": "json_object"}
+    )
+  except Exception as e:
+    raise HTTPException(status_code=500, detail="API Unavaliable")
+  
+  print(response)
+  # text_output = response.output[0].content[0].text
+  # text_output = text_output.replace("\n\n", "\n ")
+  return "how about these prices"  
+
 @router.post("/suggests")
 def get_suggestions(data: SuggestTextInput):
   
-  if not data.post:
-     raise HTTPException(status_code=401, detail="The post is empty")
+  if not data.post.strip():
+     raise HTTPException(status_code=422, detail="The post is empty")
   
   
   last_paragraphs_output = data.post[-2500:]
