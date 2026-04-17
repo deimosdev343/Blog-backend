@@ -37,7 +37,7 @@ def extract_keywords(text):
 
 
 @router.post("/suggests/v2")
-async def get_suggestions_v2(data: SuggestTextInput): 
+def get_suggestions_v2(data: SuggestTextInput): 
   if not data.post.strip():
      raise HTTPException(status_code=400, detail="The post is empty")
   
@@ -61,26 +61,25 @@ async def get_suggestions_v2(data: SuggestTextInput):
     - Do NOT write full paragraphs
     
     
-    return a list 
+    return a JSON list
 
     context: {keywords}
     Post:
     "{last_paragraphs_output}"
   """
-  print(prompt)
   try:
-    response = await client.chat.completions.create(
+    response = client.chat.completions.create(
       model="gpt-4o",
       messages=[{"role": "user", "content": prompt}],
       response_format={"type": "json_object"}
     )
   except Exception as e:
+    print(e)
     raise HTTPException(status_code=500, detail="API Unavaliable")
-  
-  print(response)
+    
   # text_output = response.output[0].content[0].text
   # text_output = text_output.replace("\n\n", "\n ")
-  return "how about these prices"  
+  return response.choices[0].message.content  
 
 @router.post("/suggests")
 def get_suggestions(data: SuggestTextInput):
