@@ -25,11 +25,6 @@ def get_db():
     finally:
         db.close()
 
-def get_last_paragraphs(text, words=500):
-  split_words = text.split()
-  relevent_words = split_words[-words:]
-  return "".join(relevent_words)
-
 def extract_keywords(text):
     kw_extractor = yake.KeywordExtractor(top=5)
     keywords = kw_extractor.extract_keywords(text)
@@ -42,10 +37,10 @@ def get_suggestions_v2(data: SuggestTextInput):
      raise HTTPException(status_code=400, detail="The post is empty")
   
   
-  last_paragraphs_output = data.post[-2500:]
+  tail = data.post[-2500:]
   
   keywords = extract_keywords(data.post);
-  print(keywords)
+  keywords_str = ", ".join(keywords)
   
   prompt = f"""
     You are a writing assistant helping a user continue their article.
@@ -60,12 +55,13 @@ def get_suggestions_v2(data: SuggestTextInput):
     - Do NOT summarize
     - Do NOT write full paragraphs
     
-    
-    return a JSON list
+    Return JSON:
+    {{ "suggestions": ["...", "...", "..."] }}
 
-    context: {keywords}
+
+    context Keywords: {keywords_str}
     Post:
-    "{last_paragraphs_output}"
+    "{tail}"
   """
   try:
     response = client.chat.completions.create(
@@ -78,48 +74,3 @@ def get_suggestions_v2(data: SuggestTextInput):
   except Exception as e:
     print(e)
     raise HTTPException(status_code=500, detail="API Unavaliable")
-
-  # text_output = response.output[0].content[0].text
-  # text_output = text_output.replace("\n\n", "\n ")
-  
-
-@router.post("/suggests")
-def get_suggestions(data: SuggestTextInput):
-  
-  if not data.post.strip():
-     raise HTTPException(status_code=422, detail="The post is empty")
-  
-  
-  last_paragraphs_output = data.post[-2500:]
-  
-  keywords = extract_keywords(data.post);
-  print(keywords)
-  
-  prompt = f"""
-    You are a writing assistant helping a user continue their article.
-
-    Given the text below, generate 3 distinct suggestions for what the writer could write next.
-    
-    Guidelines:
-    - Each suggestion should be 1–2 sentences max
-    - Continue naturally from the tone and topic
-    - Each suggestion should take a slightly different direction (e.g. example, argument, question, contrast, or storytelling)
-    - Do NOT repeat what was already written
-    - Do NOT summarize
-    - Do NOT write full paragraphs
-    
-    
-    return a list 
-
-    context: {keywords}
-    Post:
-    "{last_paragraphs_output}"
-  """
-  print(prompt)
-  response = client.responses.create(
-      model="gpt-4o",
-      input=prompt
-  )
-  text_output = response.output[0].content[0].text
-  text_output = text_output.replace("\n\n", "\n ")
-  return text_output
