@@ -39,7 +39,7 @@ def get_suggestions_v2(data: SuggestTextInput):
   
   tail = data.post[-2500:]
   
-  keywords = extract_keywords(data.post);
+  keywords = extract_keywords(tail);
   keywords_str = ", ".join(keywords)
   
   prompt = f"""
