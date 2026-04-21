@@ -87,7 +87,8 @@ def get_suggestions_v2(data: SuggestTextInput):
     response = client.chat.completions.create(
       model="gpt-4o",
       messages=[{"role": "user", "content": prompt}],
-      response_format={"type": "json_object"}
+      response_format={"type": "json_object"},
+      temperature=0.8
     )
     print(response.choices[0].message.content)
     return json.loads(response.choices[0].message.content)  
