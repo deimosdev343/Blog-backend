@@ -5,7 +5,7 @@ from models.post_model import Post, PostVote
 from models.user_model import UserModel, followers
 from routers.userposts import userposts_router
 from database import SessionLocal
-from dto.suggest_text_dto import SuggestTextInput
+from dto.suggest_text_dto import SuggestTextInput, ExpandSuggestInput
 from config import TORMENT_NEXUS_KEY
 from utils.auth_scheme import get_current_user
 from openai import OpenAI
@@ -34,7 +34,6 @@ def detect_tone(text):
         "storytelling": ["once", "suddenly", "meanwhile", "eventually", "finally"],
         "technical": ["algorithm", "data", "analysis", "process", "system"]
     }
-    
     detected = {tone: sum(1 for word in indicators if word in text.lower()) 
                 for tone, indicators in tone_indicators.items()}
     return max(detected, key=detected.get) if any(detected.values()) else "neutral"
@@ -95,3 +94,50 @@ def get_suggestions_v2(data: SuggestTextInput):
   except Exception as e:
     print(e)
     raise HTTPException(status_code=500, detail="API Unavaliable")
+
+@router.post("/expand")
+def get_expand(data: ExpandSuggestInput):
+  tail = data.post[-2500:]
+  
+  keywords = extract_keywords(tail);
+  keywords_str = ", ".join(keywords)
+  tone = detect_tone(data.post)
+  
+  prompt = f"""
+    You are helping a writer expand on a suggestion they liked.
+    
+    ORIGINAL POST CONTEXT (last part):
+    "{tail}"
+    
+    SUGGESTION THEY WANT TO EXPAND:
+    "{data.suggestion}"
+    
+    KEYWORDS:
+    "{keywords_str}"
+    
+    Write 2-4 sentences that naturally extend from the suggestion.
+    - Match the tone and style of the original post
+    - Don't repeat the suggestion verbatim
+    - End in a way that the user could continue from
+    
+    Return JSON:
+    {{
+        "expanded_text": "...",
+    }}
+    """
+  try:
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": prompt}],
+        response_format={"type": "json_object"},
+        temperature=0.7
+    )
+    
+    result = json.loads(response.choices[0].message.content)
+    
+    return result
+    
+  except Exception as e:
+    print(e)
+    raise HTTPException(status_code=500, detail="Expansion API unavailable")
+  
