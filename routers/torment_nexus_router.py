@@ -25,6 +25,20 @@ def get_db():
     finally:
         db.close()
 
+def detect_tone(text):
+    """Detect writing style and emotional tone"""
+    tone_indicators = {
+        "academic": ["furthermore", "moreover", "consequently", "thus", "therefore"],
+        "casual": ["you know", "like", "actually", "honestly", "anyway"],
+        "persuasive": ["must", "should", "clearly", "obviously", "undoubtedly"],
+        "storytelling": ["once", "suddenly", "meanwhile", "eventually", "finally"],
+        "technical": ["algorithm", "data", "analysis", "process", "system"]
+    }
+    
+    detected = {tone: sum(1 for word in indicators if word in text.lower()) 
+                for tone, indicators in tone_indicators.items()}
+    return max(detected, key=detected.get) if any(detected.values()) else "neutral"
+
 def extract_keywords(text):
     kw_extractor = yake.KeywordExtractor(top=5)
     keywords = kw_extractor.extract_keywords(text)
@@ -41,6 +55,7 @@ def get_suggestions_v2(data: SuggestTextInput):
   
   keywords = extract_keywords(tail);
   keywords_str = ", ".join(keywords)
+  tone = detect_tone(data.post)
   
   prompt = f"""
     You are a writing assistant helping a user continue their article.
@@ -55,11 +70,16 @@ def get_suggestions_v2(data: SuggestTextInput):
     - Do NOT summarize
     - Do NOT write full paragraphs
     
+    
+    CONTEXT ANALYSIS:
+    - Tone: {tone}
+    - context Keywords: {keywords_str}
+    
+    
     Return JSON:
     {{ "suggestions": ["...", "...", "..."] }}
 
 
-    context Keywords: {keywords_str}
     Post:
     "{tail}"
   """
