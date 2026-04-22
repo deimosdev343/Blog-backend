@@ -99,6 +99,11 @@ def get_suggestions_v2(data: SuggestTextInput):
 def get_expand(data: ExpandSuggestInput):
   tail = data.post[-2500:]
   
+  if not data.post.strip():
+     raise HTTPException(status_code=400, detail="The post is empty")
+  if not data.suggestion.strip():
+     raise HTTPException(status_code=400, detail="The suggestion is empty")
+   
   keywords = extract_keywords(tail);
   keywords_str = ", ".join(keywords)
   tone = detect_tone(data.post)
