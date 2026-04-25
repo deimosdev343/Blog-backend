@@ -1,5 +1,4 @@
 def detect_tone(text):
-    """Detect writing style and emotional tone with comprehensive word lists"""
     tone_indicators = {
         "academic": [
             "furthermore", "moreover", "consequently", "thus", "therefore", "nevertheless",
@@ -117,26 +116,7 @@ def detect_tone(text):
             "belonging", "appreciated", "valued", "respected", "admired", "loved"
         ]
     }
+    detected = {tone: sum(1 for word in indicators if word in text.lower()) 
+                for tone, indicators in tone_indicators.items()}
+    return max(detected, key=detected.get) if any(detected.values()) else "neutral"
     
-    # Count occurrences for each tone
-    detected = {}
-    text_lower = text.lower()
-    
-    for tone, indicators in tone_indicators.items():
-        # Count each indicator (avoid double-counting overlapping phrases)
-        count = 0
-        for indicator in indicators:
-            if indicator in text_lower:
-                # Weight longer phrases more heavily
-                weight = len(indicator.split())  # Number of words in phrase
-                count += max(1, weight)  # At least 1 point, more for phrases
-        detected[tone] = count
-    
-    # Return the highest scoring tone, or "neutral" if all are zero
-    if any(detected.values()):
-        # Add a small threshold - at least 2 points to register
-        max_tone = max(detected, key=detected.get)
-        if detected[max_tone] >= 1:
-            return max_tone
-    
-    return "neutral"

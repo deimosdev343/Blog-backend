@@ -9,6 +9,7 @@ from dto.suggest_text_dto import SuggestTextInput, ExpandSuggestInput
 from config import TORMENT_NEXUS_KEY
 from utils.auth_scheme import get_current_user
 from openai import OpenAI
+from services.language_processing.language_processing import detect_tone
 import yake
 import json
 
@@ -25,18 +26,6 @@ def get_db():
     finally:
         db.close()
 
-def detect_tone(text):
-    """Detect writing style and emotional tone"""
-    tone_indicators = {
-        "academic": ["furthermore", "moreover", "consequently", "thus", "therefore"],
-        "casual": ["you know", "like", "actually", "honestly", "anyway"],
-        "persuasive": ["must", "should", "clearly", "obviously", "undoubtedly"],
-        "storytelling": ["once", "suddenly", "meanwhile", "eventually", "finally"],
-        "technical": ["algorithm", "data", "analysis", "process", "system"]
-    }
-    detected = {tone: sum(1 for word in indicators if word in text.lower()) 
-                for tone, indicators in tone_indicators.items()}
-    return max(detected, key=detected.get) if any(detected.values()) else "neutral"
 
 def extract_keywords(text):
     kw_extractor = yake.KeywordExtractor(top=5)
