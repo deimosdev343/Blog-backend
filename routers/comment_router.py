@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from models.post_model import PostComment, Post
 from models.user_model import UserModel
 from database import SessionLocal
@@ -27,6 +27,7 @@ def get_post_comments(
   stmt = (
     select(PostComment)
     .where(PostComment.post_id == post_id)
+    .options(joinedload(PostComment.author))
     .order_by(PostComment.created_at.desc())
     .offset(skip)
     .limit(limit))
