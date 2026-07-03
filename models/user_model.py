@@ -23,7 +23,7 @@ class UserModel(Base):
   avatar_url = Column(String(500), nullable = True)
   description = Column(String(10000), nullable= True)
   
-  comments = relationship("PostComment", back_populates="post", cascade="all, delete-orphan")
+  comments = relationship("PostComment", back_populates="author", cascade="all, delete-orphan")
     
   following = relationship(
     "UserModel",
