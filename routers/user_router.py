@@ -114,8 +114,7 @@ def update_info(
 
 @router.put("/update_avatar")
 def update_avatar(
-  user_avatar: updateAvatar, 
-  background_tasks: BackgroundTasks,
+  user_avatar: updateAvatar,
   db: Session = Depends(get_db),
   user = Depends(get_current_user),
 ):
@@ -127,11 +126,7 @@ def update_avatar(
   
   result = db.execute(stmt)
   db.commit()
-  background_tasks.add_task(
-    update_avatar_in_posts, 
-    user_id = user["id"], avatar_url = user_avatar.avatar_url, 
-    db=db
-  )
+  
   
   return {"msg":"avatar updated successfully"}
   
