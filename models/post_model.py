@@ -15,6 +15,8 @@ class Post(Base):
   created_at = Column(DateTime, default=func.now())
   updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
   
+  comments = relationship("PostComment", back_populates="post", cascade="all, delete-orphan")
+  
 class PostVote(Base):
   __tablename__ = "post_votes"
   user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
@@ -26,12 +28,13 @@ class PostVote(Base):
   )
   
 class PostComment(Base):
-  __tablename__ = "post_comments"
-  id = Column(Integer, primary_key=True, autoincrement=True)
-  post_id = Column(Integer, ForeignKey("posts.id"), primary_key=True)
-  author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-  content = Column(Text(300000), nullable=False)
-  username = Column(String(100), nullable= False)
-  user_avatar = Column(String(500), nullable=True)
-  created_at = Column(DateTime, default=func.now())
-  updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    __tablename__ = "post_comments"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    post_id = Column(Integer, ForeignKey("posts.id"), nullable=False, index=True)
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    post = relationship("Post", back_populates="comments")
+    author = relationship("UserModel", back_populates="comments")
