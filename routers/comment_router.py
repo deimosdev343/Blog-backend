@@ -6,6 +6,8 @@ from database import SessionLocal
 from utils.auth_scheme import get_current_user, blacklist_token, get_current_user_if_logged_in
 from sqlalchemy import update, insert, delete, select, func, case
 from dto.comment_dto import CommentDto
+from response_models.comment.comment import CommentListOut
+
 router = APIRouter(
   prefix="/comment"
 );
@@ -17,7 +19,7 @@ def get_db():
   finally:
     db.close()
 
-@router.get("/{post_id}")
+@router.get("/{post_id}", response_model=CommentListOut)
 def get_post_comments(
   post_id: int,
   limit: int = 10,
