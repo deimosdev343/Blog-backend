@@ -22,7 +22,7 @@ class UserModel(Base):
   created_at = Column(DateTime, default=func.now())
   avatar_url = Column(String(500), nullable = True)
   description = Column(String(10000), nullable= True)
-  posts = relationship("posts", back_populates="author", cascade="all, delete-orphan")
+  
   comments = relationship("PostComment", back_populates="author", cascade="all, delete-orphan")
     
   following = relationship(

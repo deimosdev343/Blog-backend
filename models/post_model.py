@@ -8,13 +8,13 @@ class Post(Base):
   
   id = Column(Integer, primary_key=True)
   author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-  title = Column(Text(), nullable=False)
-  content = Column(Text(), nullable=False)
+  title = Column(String(100), nullable=False)
+  content = Column(Text(300000), nullable=False)
   username = Column(String(100), nullable= False)
   user_avatar = Column(String(500), nullable=True)
   created_at = Column(DateTime, default=func.now())
   updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-  author = relationship("UserModel", back_populates="post")
+  
   comments = relationship("PostComment", back_populates="post", cascade="all, delete-orphan")
   
 class PostVote(Base):
