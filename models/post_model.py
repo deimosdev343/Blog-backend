@@ -8,8 +8,8 @@ class Post(Base):
   
   id = Column(Integer, primary_key=True)
   author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-  title = Column(String(100), nullable=False)
-  content = Column(Text(300000), nullable=False)
+  title = Column(Text(), nullable=False)
+  content = Column(Text(), nullable=False)
   username = Column(String(100), nullable= False)
   user_avatar = Column(String(500), nullable=True)
   created_at = Column(DateTime, default=func.now())
