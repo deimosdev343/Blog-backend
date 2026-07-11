@@ -14,7 +14,7 @@ class Post(Base):
   user_avatar = Column(String(500), nullable=True)
   created_at = Column(DateTime, default=func.now())
   updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-  
+  author = relationship("UserModel", back_populates="post")
   comments = relationship("PostComment", back_populates="post", cascade="all, delete-orphan")
   
 class PostVote(Base):
