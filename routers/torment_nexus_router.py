@@ -84,6 +84,7 @@ def get_suggestions_v2(data: SuggestTextInput):
     print(e)
     raise HTTPException(status_code=500, detail="API Unavaliable")
 
+
 @router.post("/expand")
 def get_expand(data: ExpandSuggestInput):
   tail = data.post[-2500:]
