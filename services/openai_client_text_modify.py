@@ -3,6 +3,9 @@ from openai import OpenAI
 from dto.suggest_text_dto import transfromTextInput, SuggestTextInput, ExpandSuggestInput
 client = OpenAI(api_key=TORMENT_NEXUS_KEY)
 from services.language_processing.language_processing import detect_tone
+import yake
+
+
 ACTION_RULES ={ 
   "improve":"""
     Rewrite the passage so it reads better: tighter phrasing, stronger verbs,
@@ -49,6 +52,13 @@ TEMPERATURES = {
     "tone": 0.6,
 }
 
+
+def extract_keywords(text):
+    kw_extractor = yake.KeywordExtractor(top=5)
+    keywords = kw_extractor.extract_keywords(text)
+    return [kw for kw, score in keywords]
+
+
 def transform_selection(data: transfromTextInput):
   selection = data.text.strip()
   context = data.context[-2500:]
@@ -64,5 +74,13 @@ def transform_selection(data: transfromTextInput):
       f"The surrounding post reads as: {detected}. Match it."
       if detected
       else "Match the voice of the surrounding post."
+    )
+    keywords_str = ", ".join(extract_keywords(context)) if context.strip() else ""
+     
+    rule = ACTION_RULES[data.action].format(
+        word_count=word_count,
+        short_target=max(5, int(word_count * 0.6)),
+        long_target=int(word_count * 1.8),
+        tone=data.tone,
     )
   
