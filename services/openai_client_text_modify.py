@@ -1,0 +1,51 @@
+from config import TORMENT_NEXUS_KEY
+from openai import OpenAI
+
+client = OpenAI(api_key=TORMENT_NEXUS_KEY)
+
+ACTION_RULES ={ 
+  "improve":"""
+    Rewrite the passage so it reads better: tighter phrasing, stronger verbs,
+    less hedging, smoother rhythm. Keep every fact, claim and opinion the
+    writer made. Do not add new ideas or examples of your own.
+  """,
+  "shorten":"""
+      Cut the passage down while keeping every idea it contains. Remove filler,
+    redundancy and throat-clearing rather than content. Aim for roughly
+    {short_target} words; never exceed {word_count} words.
+  """,
+  "expand": """
+    Develop the passage further. Keep the writer's existing sentences intact in
+    substance and add supporting detail, a concrete example, or the reasoning
+    behind a claim. Aim for roughly {long_target} words. Do not introduce facts,
+    statistics, names or dates that could be wrong — stay at the level of
+    reasoning and illustration.
+  """,
+  "grammar": """
+    Fix only what is incorrect: spelling, grammar, punctuation, verb agreement
+    and obvious typos. This is a correction pass, not a rewrite. Preserve the
+    writer's word choice, sentence structure, voice and any deliberate
+    informality. If a sentence is already correct, return it unchanged.
+  """,
+  "tone": """
+    Rewrite the passage in a {tone} register. Keep the same meaning, the same
+    facts and roughly the same length. Change diction and sentence shape, not
+    substance.
+  """,
+}
+
+TONE_GUIDES = {
+    "professional": "measured and precise, no slang, no exclamation marks",
+    "casual": "relaxed and conversational, contractions welcome, like talking to a friend",
+    "confident": "direct and declarative, no hedging words like 'maybe', 'I think', 'sort of'",
+    "plain": "simple and concrete, short sentences, no jargon or abstraction",
+}
+
+TEMPERATURES = {
+    "improve": 0.5,
+    "shorten": 0.3,
+    "expand": 0.7,
+    "grammar": 0.1,
+    "tone": 0.6,
+}
+
