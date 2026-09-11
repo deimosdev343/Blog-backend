@@ -1,8 +1,8 @@
 from config import TORMENT_NEXUS_KEY
 from openai import OpenAI
-
+from dto.suggest_text_dto import transfromTextInput, SuggestTextInput, ExpandSuggestInput
 client = OpenAI(api_key=TORMENT_NEXUS_KEY)
-
+from services.language_processing.language_processing import detect_tone
 ACTION_RULES ={ 
   "improve":"""
     Rewrite the passage so it reads better: tighter phrasing, stronger verbs,
@@ -49,3 +49,20 @@ TEMPERATURES = {
     "tone": 0.6,
 }
 
+def transform_selection(data: transfromTextInput):
+  selection = data.text.strip()
+  context = data.context[-2500:]
+  word_count = len(selection.split())
+  if(data.action == "tone"):
+    tone_line = f"traget register {data.tone} - {TONE_GUIDES[data.tone]}."
+  else:
+    try:
+      detected = detect_tone(context) if len(context.split()) > 30 else None
+    except Exception:
+      detected = None
+    tone_line = (
+      f"The surrounding post reads as: {detected}. Match it."
+      if detected
+      else "Match the voice of the surrounding post."
+    )
+  
