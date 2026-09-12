@@ -10,6 +10,7 @@ from config import TORMENT_NEXUS_KEY
 from utils.auth_scheme import get_current_user
 from openai import OpenAI
 from services.language_processing.language_processing import detect_tone
+from services.openai_client_text_modify import transform_selection
 import yake
 import json
 
@@ -31,6 +32,21 @@ def extract_keywords(text):
     kw_extractor = yake.KeywordExtractor(top=5)
     keywords = kw_extractor.extract_keywords(text)
     return [kw for kw, score in keywords]
+
+@router.post("/transform")
+def transform_controller(data: transform_selection):
+  if not data.text.strip():
+    raise HTTPException(status_code=400, detail="The selection is empty")
+  try:
+    result = transform_selection(data)
+    return {"result": result}
+  except HTTPException:
+    raise
+  except Exception as e:
+    print(e)
+    raise HTTPException(status_code=500, detail="Transform API unavailable")
+
+  
 
 
 @router.post("/suggests/v2")
