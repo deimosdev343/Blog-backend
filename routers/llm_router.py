@@ -11,6 +11,8 @@ from utils.auth_scheme import get_current_user
 from openai import OpenAI
 from services.language_processing.language_processing import detect_tone
 from services.openai_client_text_modify import transform_selection
+from dto.suggest_text_dto import transfromTextInput, SuggestTextInput, ExpandSuggestInput
+
 import yake
 import json
 
@@ -34,7 +36,7 @@ def extract_keywords(text):
     return [kw for kw, score in keywords]
 
 @router.post("/transform")
-def transform_controller(data: transform_selection):
+def transform_controller(data: transfromTextInput):
   if not data.text.strip():
     raise HTTPException(status_code=400, detail="The selection is empty")
   try:
