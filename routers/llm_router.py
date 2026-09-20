@@ -53,7 +53,7 @@ def transform_controller(data: transfromTextInput, user = Depends(get_current_us
 
 
 @router.post("/suggests/v2")
-def get_suggestions_v2(data: SuggestTextInput): 
+def get_suggestions_v2(data: SuggestTextInput, user = Depends(get_current_user)): 
   if not data.post.strip():
      raise HTTPException(status_code=400, detail="The post is empty")
   
@@ -105,7 +105,7 @@ def get_suggestions_v2(data: SuggestTextInput):
 
 
 @router.post("/expand")
-def get_expand(data: ExpandSuggestInput):
+def get_expand(data: ExpandSuggestInput, user = Depends(get_current_user)):
   tail = data.post[-2500:]
   
   if not data.post.strip():
