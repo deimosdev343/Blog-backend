@@ -1,0 +1,4 @@
+pytest>=8.0
+httpx>=0.27          # required by fastapi.testclient.TestClient
+pytest-cov>=5.0      # optional: pytest --cov=. --cov-report=term-missing
+ 
