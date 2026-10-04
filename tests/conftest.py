@@ -24,6 +24,7 @@ from routers import (
   llm_router,
   post_router,
   user_router,
+  vote_router
 )
 
 from routers.user_router import userposts_router
@@ -42,3 +43,33 @@ TestingSessionLocal = sessionmaker(
 )
 
 @event.listens_for(TEST_ENGINE, "connect")
+def _enable_sqlite_foreign_keys(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
+def _override_get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+_DB_DEPENDENCIES = (
+    user_router.get_db,
+    post_router.get_db,
+    follow_router.get_db,
+    vote_router.get_db,
+    comment_router.get_db,
+    llm_router.get_db,
+    userposts_router.get_db,
+)
+
+@pytest.fixture(autouse=True)
+def _fresh_schema():
+    Base.metadata.create_all(bind=TEST_ENGINE)
+    yield
+    Base.metadata.drop_all(bind=TEST_ENGINE)
+
+    
