@@ -6,7 +6,7 @@ from models.user_model import UserModel, followers
 from routers.userposts import userposts_router
 from database import SessionLocal
 from dto.suggest_text_dto import SuggestTextInput, ExpandSuggestInput
-from config import TORMENT_NEXUS_KEY
+from config import OPEN_AI_KEY
 from utils.auth_scheme import get_current_user
 from openai import OpenAI
 from services.language_processing.language_processing import detect_tone
@@ -21,7 +21,7 @@ import json
 router = APIRouter(
   prefix="/ai",
 )
-client = OpenAI(api_key=TORMENT_NEXUS_KEY)
+client = OpenAI(api_key=OPEN_AI_KEY)
 
 def get_db():
     db = SessionLocal()

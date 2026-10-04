@@ -1,7 +1,7 @@
-from config import TORMENT_NEXUS_KEY
+from config import OPEN_AI_KEY
 from openai import OpenAI
 from dto.suggest_text_dto import transfromTextInput, SuggestTextInput, ExpandSuggestInput
-client = OpenAI(api_key=TORMENT_NEXUS_KEY)
+client = OpenAI(api_key=OPEN_AI_KEY)
 from services.language_processing.language_processing import detect_tone
 import yake
 import json
