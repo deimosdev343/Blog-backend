@@ -23,4 +23,15 @@ class TestPasswordHashing:
   def test_none_ascii(self):
     stored = hash_password("тестовые_пароль").decode("utf-8")
     assert verify_password("тестовые_пароль",stored) is True
-  
+
+
+class TestAccessTokens:
+  def test_preserve_claim(self):
+    token = create_access_token(
+      {"username":"vasyan", "email":"vasyan@ap-pro.ru", "id": 13}
+    )
+    payload = decode_access_token(token)
+    
+    assert payload["username"] == "vasyan"
+    assert payload["email"] == "vasyan@ap-pro.ru"
+    assert payload["id"] ==  13
