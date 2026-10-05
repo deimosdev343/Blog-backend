@@ -20,5 +20,7 @@ class TestPasswordHashing:
   def test_rejects_wrong_password(self):
     stored = hash_password("testPass").decode("utf-8")
     assert verify_password("testwrongpass",  stored) is False
-  
+  def test_none_ascii(self):
+    stored = hash_password("тестовые_пароль").decode("utf-8")
+    assert verify_password("тестовые_пароль",stored) is True
   
