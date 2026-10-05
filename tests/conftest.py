@@ -72,4 +72,17 @@ def _fresh_schema():
     yield
     Base.metadata.drop_all(bind=TEST_ENGINE)
 
-    
+@pytest.fixture(autouse=True)
+def _dependency_overrides():
+    for dependency in _DB_DEPENDENCIES:
+        app.dependency_overrides[dependency] = _override_get_db
+    yield
+    app.dependency_overrides.clear()
+
+@pytest.fixture(autouse=True)
+def _reset_module_globals():
+    limiter.enabled = False
+    auth_scheme.blocked_tokens.clear()
+    yield
+    auth_scheme.blocked_tokens.clear()
+    limiter.enabled = True
