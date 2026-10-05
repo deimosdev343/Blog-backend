@@ -117,3 +117,24 @@ def make_user(db_session):
  
     return _make_user
 
+@pytest.fixture
+def client():
+    with TestClient(app) as test_client:
+        yield test_client
+ 
+ 
+@pytest.fixture
+def auth_client(client):
+    def _as_user(user):
+        payload = {
+            "username": user.username,
+            "email": user.email,
+            "id": user.id,
+        }
+        app.dependency_overrides[auth_scheme.get_current_user] = lambda: payload
+        app.dependency_overrides[
+            auth_scheme.get_current_user_if_logged_in
+        ] = lambda: payload
+        return client
+ 
+    return _as_user
