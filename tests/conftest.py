@@ -82,7 +82,38 @@ def _dependency_overrides():
 @pytest.fixture(autouse=True)
 def _reset_module_globals():
     limiter.enabled = False
-    auth_scheme.blocked_tokens.clear()
     yield
     auth_scheme.blocked_tokens.clear()
     limiter.enabled = True
+
+@pytest.fixture
+def db_session():
+    session = TestingSessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
+ 
+@pytest.fixture
+def make_user(db_session):
+    def _make_user(
+        username="alice",
+        email=None,
+        password="hunter2",
+        avatar_url=None,
+        description=None,
+    ):
+        user = UserModel(
+            username=username,
+            email=f"{username}@example.com",
+            hashed_password=hash_password(password).decode("utf-8"),
+            avatar_url=avatar_url,
+            description=description,
+        )
+        db_session.add(user)
+        db_session.commit()
+        db_session.refresh(user)
+        return user
+ 
+    return _make_user
+
