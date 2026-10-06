@@ -106,7 +106,7 @@ def make_user(db_session):
         user = UserModel(
             username=username,
             email=f"{username}@example.com",
-            hashed_password=hash_password(password).decode("utf-8"),
+            hashed_password=hash_password(password),
             avatar_url=avatar_url,
             description=description,
         )

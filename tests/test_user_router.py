@@ -67,3 +67,52 @@ class TestRegister:
           "/user/register", json={"username": "alice", "password": "hunter2"}
       )
       assert response.status_code == 422
+
+class TestLogin:
+  def test_returns_token_and_user_data(self, client, make_user):
+    user = make_user(username="alice", password="hunter2")
+    response = client.post(
+        "/user/login", json={"username": "alice", "password": "hunter2"}
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["token_type"] == "bearer"
+    assert body["access_token"]
+    assert body["user_data"] == {
+        "username": "alice",
+        "email": user.email,
+        "id": user.id,
+    }
+  def test_the_returned_token_authenticates(self, client, make_user):
+    make_user(username="alice", password="hunter2")
+    token = client.post(
+        "/user/login", json={"username": "alice", "password": "hunter2"}
+    ).json()["access_token"]
+    response = client.get(
+        "/user/auth", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 200
+    assert response.json()["username"] == "alice"
+  
+  def test_rejects_wrong_password(self, client, make_user):
+    make_user(username="alice", password="hunter2")
+    response = client.post(
+        "/user/login", json={"username": "alice", "password": "wrong"}
+    )
+    assert response.status_code == 401
+
+  def test_register_then_login_round_trip(self, client):
+    client.post(
+        "/user/register",
+        json={
+            "username": "alice",
+            "password": "hunter2",
+            "email": "alice@example.com",
+        },
+    )
+
+    response = client.post(
+        "/user/login", json={"username": "alice", "password": "hunter2"}
+    )
+
+    assert response.status_code == 200

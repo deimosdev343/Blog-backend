@@ -1,10 +1,10 @@
 import bcrypt
 
-def hash_password(password: str):
-  encoded_password = password.encode("utf-8")
-  return bcrypt.hashpw(encoded_password,bcrypt.gensalt());
+def hash_password(password: str) -> str:
+  hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+  return hashed.decode("utf-8")
 
 def verify_password(cleartxt_pw, hashed_pw):
-  encoded_cleartxt = cleartxt_pw.encode("utf-8")
-  encoded_hashed = hashed_pw.encode("utf-8")
-  return bcrypt.checkpw(encoded_cleartxt, encoded_hashed)
+  if isinstance(hashed_pw, str):
+    hashed_pw = hashed_pw.encode("utf-8")
+  return bcrypt.checkpw(cleartxt_pw.encode("utf-8"), hashed_pw)
