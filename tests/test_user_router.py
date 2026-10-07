@@ -152,7 +152,7 @@ class TestProfileUpdates:
     assert (
       db_session.get(UserModel, user.id).avatar_url == "http://ass.com/ass2.jpg"
     )
-  def test_a_user_can_only_update_their_own_profile(
+  def test_user_only_updates_own_profile(
       self, auth_client, make_user, db_session
   ):
       alice = make_user(username="alice")
