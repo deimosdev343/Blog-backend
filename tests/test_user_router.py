@@ -116,3 +116,21 @@ class TestLogin:
     )
 
     assert response.status_code == 200
+
+class TestGetUser:
+  def test_returns_profile(self,client, make_user):
+    user = make_user(
+      "username": "alice",
+      "avatar_url":"https://example.com/ass.jpg",
+      "description":"test user"      
+    )
+    response = client.get(f"/user/{user.id}")
+    
+    assert response.status_code == 200
+    assert response.json() == {
+      "username":"alice",
+      "avatar_url":"https://example.com/ass.jpg",
+      "description":"rest user"
+    }
+    
+  
