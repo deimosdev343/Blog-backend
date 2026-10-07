@@ -120,9 +120,9 @@ class TestLogin:
 class TestGetUser:
   def test_returns_profile(self,client, make_user):
     user = make_user(
-      "username": "alice",
-      "avatar_url":"https://example.com/ass.jpg",
-      "description":"test user"      
+      username= "alice",
+      avatar_url="https://example.com/ass.jpg",
+      description="test user"      
     )
     response = client.get(f"/user/{user.id}")
     
@@ -130,7 +130,11 @@ class TestGetUser:
     assert response.json() == {
       "username":"alice",
       "avatar_url":"https://example.com/ass.jpg",
-      "description":"rest user"
+      "description":"test user"
     }
     
-  
+  def password_hashed(self, client, make_user):
+    user = make_user(username="vasa")
+    body = client.get(f"/user/{user.id}").json()
+    assert "hashed_password" not in body
+    assert "email" not in body
