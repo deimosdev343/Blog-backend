@@ -138,3 +138,36 @@ class TestGetUser:
     body = client.get(f"/user/{user.id}").json()
     assert "hashed_password" not in body
     assert "email" not in body
+  
+class TestProfileUpdates:
+  def test_update_avatar(self, auth_client, make_user, db_session):
+    user = make_user(username="Susie")
+    client = auth_client(user)
+    response = client.put(
+      "/user/update_avatar",
+      json={"avatar_url":"http://ass.com/ass2.jpg"}
+    )
+    assert response.status_code == 200
+    db_session.expire_all()
+    assert (
+      db_session.get(UserModel, user.id).avatar_url == "http://ass.com/ass2.jpg"
+    )
+  def test_a_user_can_only_update_their_own_profile(
+      self, auth_client, make_user, db_session
+  ):
+      alice = make_user(username="alice")
+      bob = make_user(
+          username="bob", avatar_url="https://example.com/bob.png"
+      )
+      auth_client(alice).put(
+          "/user/update_avatar",
+          json={"avatar_url": "https://example.com/alice.png"},
+      )
+
+      db_session.expire_all()
+      assert (
+          db_session.get(UserModel, bob.id).avatar_url
+          == "https://example.com/bob.png"
+      )
+
+    
