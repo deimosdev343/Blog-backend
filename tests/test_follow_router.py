@@ -26,4 +26,14 @@ class TestFollow:
     )
     assert response.status_code == 200
     assert _follows(db_session,vasyan, arnold) is True
+  def test_following_directional(
+    self,auth_client, make_user,db_session
+  ):
+    vasyan = make_user(username="vasyan")
+    arnold = make_user(username="arnie")
+    response = auth_client(vasyan).post(
+      "/follow/", json={"follow_user_id": str(arnold.id)}
+    )
+    assert response.status_code == 200
+    assert _follows(db_session, arnold, vasyan) is False
     
