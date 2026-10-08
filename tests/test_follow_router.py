@@ -54,3 +54,18 @@ class TestFollow:
     )
 
     assert response.status_code == 400
+
+class TestUnfollow:
+  def test_remove_follow(
+    self,auth_client, make_user,db_session
+  ):
+    vasyan = make_user(username="vasyan")
+    den = make_user(username="den")
+    client = auth_client(vasyan)
+    client.post("/follow/", json={"follow_user_id": str(den.id)})
+
+    response = client.delete(f"/follow/{den.id}")
+
+    assert response.status_code == 200
+    assert _follows(db_session, vasyan, den) is False
+  
