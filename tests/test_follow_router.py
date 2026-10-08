@@ -36,4 +36,21 @@ class TestFollow:
     )
     assert response.status_code == 200
     assert _follows(db_session, arnold, vasyan) is False
-    
+  
+  def test_unable_follow_nonexisting_user(
+    self,auth_client, make_user,db_session
+  ):
+    vasyan = make_user(username="vasyan")
+    response = auth_client(vasyan).post(
+      "/follow/", json={"follow_user_id": str("67")}
+    )
+    assert response.status_code == 404
+  
+  def test_a_user_cannot_follow_themselves(self, auth_client, make_user):
+    alice = make_user(username="alice")
+
+    response = auth_client(alice).post(
+        "/follow/", json={"follow_user_id": str(alice.id)}
+    )
+
+    assert response.status_code == 400
