@@ -33,7 +33,14 @@ class TestCreatePost:
     assert post.username == "user"
     assert post.user_avatar == "https://fakeimages.com/1.jpg"
     
-  
+  def test_rejects_missing_field(
+    self, auth_client, make_user
+  ):
+    user = make_user(username="user")
+    response = auth_client(user).post("/posts/", json={"title":"hello"})
+    
+    assert response.status_code == 422  
+
     
     
     
