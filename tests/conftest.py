@@ -138,3 +138,21 @@ def auth_client(client):
         return client
  
     return _as_user
+
+@pytest.fixture
+def make_post(db_session):
+    def _make_post(author, title="A title", content="Some content"):
+        post = Post(
+            author_id=author.id,
+            title=title,
+            content=content,
+            username=author.username,
+            user_avatar=author.avatar_url,
+        )
+        db_session.add(post)
+        db_session.commit()
+        db_session.refresh(post)
+        return post
+ 
+    return _make_post
+ 
