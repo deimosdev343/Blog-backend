@@ -66,6 +66,16 @@ class TestListPosts:
 
     assert body["upvotes"] == 2
     assert body["downvotes"] == 1
+  def test_ordered_by_date(
+    self, client,make_user, make_post
+  ):
+    user = make_user(username="user")
+    make_post(user, title="post",created_at=BASE_TIME)
+    make_post(user, title="new_post", created_at=BASE_TIME + timedelta(hours=1))
+    titles = [p["title"] for p in client.get("/posts/").json()]
+
+    assert titles == ["post", "new_post"]
+    
 
     
     

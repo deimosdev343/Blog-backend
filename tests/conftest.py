@@ -1,4 +1,6 @@
 import os
+from datetime import datetime, timedelta
+
 TEST_DATABASE_URL = "sqlite+pysqlite:///:memory:"
 
 os.environ["DATABASE_URL"] = TEST_DATABASE_URL
@@ -141,7 +143,7 @@ def auth_client(client):
 
 @pytest.fixture
 def make_post(db_session):
-    def _make_post(author, title="A title", content="Some content"):
+    def _make_post(author, title="A title", content="Some content", created_at=datetime(2026, 1, 1, 12, 0, 0)):
         post = Post(
             author_id=author.id,
             title=title,
