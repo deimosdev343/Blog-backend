@@ -9,7 +9,6 @@ from utils.auth import create_access_token
 from utils.auth_scheme import get_current_user, blacklist_token
 from sqlalchemy import update
 from routers.userposts import userposts_router
-from routers.follows import follow_router;
 from utils.limiter import limiter
 from fastapi import Request
 router = APIRouter(
