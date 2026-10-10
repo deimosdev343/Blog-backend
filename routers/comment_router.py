@@ -51,9 +51,7 @@ def create_post_comment(
     author_id = current_user["id"],
     content = comment.content,
     post_id = comment.post_id,
-    username = current_user["username"],
-    user_avatar = user_data.avatar_url
-  ));
+  ))
   db.commit();
   return {"msg": "Comment successfully left on post"}
   
