@@ -2,9 +2,6 @@ from sqlalchemy import Column, Integer, String, DateTime, Table,ForeignKey, Uniq
 from sqlalchemy.orm import relationship
 from database import Base
 
-
-#блять как же я тут навасанила
-
 followers = Table(
   'followers',
   Base.metadata,

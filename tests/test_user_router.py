@@ -121,7 +121,7 @@ class TestGetUser:
   def test_returns_profile(self,client, make_user):
     user = make_user(
       username= "alice",
-      avatar_url="https://example.com/ass.jpg",
+      avatar_url="https://example.com/test.jpg",
       description="test user"      
     )
     response = client.get(f"/user/{user.id}")
@@ -129,7 +129,7 @@ class TestGetUser:
     assert response.status_code == 200
     assert response.json() == {
       "username":"alice",
-      "avatar_url":"https://example.com/ass.jpg",
+      "avatar_url":"https://example.com/test.jpg",
       "description":"test user"
     }
     
@@ -145,12 +145,12 @@ class TestProfileUpdates:
     client = auth_client(user)
     response = client.put(
       "/user/update_avatar",
-      json={"avatar_url":"http://ass.com/ass2.jpg"}
+      json={"avatar_url":"http://test.com/test2.jpg"}
     )
     assert response.status_code == 200
     db_session.expire_all()
     assert (
-      db_session.get(UserModel, user.id).avatar_url == "http://ass.com/ass2.jpg"
+      db_session.get(UserModel, user.id).avatar_url == "http://test.com/test2.jpg"
     )
   def test_user_only_updates_own_profile(
       self, auth_client, make_user, db_session
