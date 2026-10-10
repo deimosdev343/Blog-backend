@@ -8,6 +8,10 @@ from utils.auth import create_access_token, decode_access_token
 from utils.hash import hash_password, verify_password
  
 class TestPasswordHashing:
+  def test_hash_not_cleartext(self):
+    hashed = hash_password("hunter2")
+    assert "hunter2" not in hashed 
+    assert hashed.startswith("$2b$")
   def test_salted(self):
     assert hash_password("testPassword") != hash_password("testPassword")
   def test_accept_correct_password(self):
