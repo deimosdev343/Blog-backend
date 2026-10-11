@@ -45,7 +45,6 @@ def create_post_comment(
   post = db.query(Post).filter(Post.id == comment.post_id).first()
   if not post:
     raise HTTPException(status_code=404, detail="Post not found")
-  user_data = db.query(UserModel).filter(UserModel.username == current_user["username"]).first()
 
   db.add(PostComment(
     author_id = current_user["id"],
